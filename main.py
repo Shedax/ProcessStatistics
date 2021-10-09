@@ -21,6 +21,7 @@ def get_timer():
 
 path = get_path()
 timer = get_timer()
+#запускаем процесс
 proc = Popen(
     r"" + path,
     shell=True,
@@ -28,13 +29,17 @@ proc = Popen(
 )
 time.sleep(5)
 RUN = True
+#получение имени процесса
 PROCNAME = path.split('\\')[len(path.split('\\')) - 1]
+#создание файла логирования если он отсутствует
 with open(PROCNAME.split('.')[0] + "_data.txt", "r+") as f:
     text = f.read()
     if len(text) == 0:
         f.write('Загрузка CPU\t\tWorking Set\t\tPrivate Bytes\t\tHandle Count\t\tВремя')
+
 nid = 0
 while RUN:
+    #проверка существования процесса
     if nid != 0 and not psutil.pid_exists(nid):
         RUN = False
     else:
@@ -44,6 +49,7 @@ while RUN:
                 data = str(Data)
                 p = psutil.Process(proc.pid)
                 nid = proc.pid
+                #получение количества хендлов
                 for i in range(len(data)):
                     if PROCNAME.lower() in data.split("\\r\\r\\n")[i].lower():
                         handles = str(data.split("\\r\\r\\n")[i].split(' ')[0])
